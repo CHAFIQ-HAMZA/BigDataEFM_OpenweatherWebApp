@@ -15,4 +15,4 @@ The following are examples of the top 5 charts created as prototypes by **Hamza*
 
 ### Example Chart :
 
-![Chart Example](Top%207%20main%20charts.jpeg)
+![Chart Example](Top%208%20main%20charts.jpeg)

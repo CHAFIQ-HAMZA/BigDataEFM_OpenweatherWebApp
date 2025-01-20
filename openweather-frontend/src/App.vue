@@ -6,6 +6,7 @@ import WindDirection from './components/WindDirection.vue';
 import AnomalyPerDay from './components/AnomalyPerDay.vue';
 import GeographicClustring from './components/GeographicClustring.vue';
 import TemperaturePrediction from './components/TemperaturePrediction.vue';
+import ArimaPrediction from './components/ArimaPrediction.vue';
 </script>
 
 <template>
@@ -19,6 +20,7 @@ import TemperaturePrediction from './components/TemperaturePrediction.vue';
           <AnomalyPerDay />
           <GeographicClustring />
           <TemperaturePrediction />
+          <ArimaPrediction />
         </div>
     </div>
   </div>

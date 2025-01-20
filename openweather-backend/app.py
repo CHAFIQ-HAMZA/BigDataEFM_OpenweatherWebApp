@@ -12,6 +12,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 # Force Matplotlib to use the Agg backend
 import matplotlib
+from statsmodels.tsa.arima.model import ARIMA
 matplotlib.use('Agg')
 
 app = Flask(__name__)
@@ -149,6 +150,41 @@ def temperature_prediction():
                                                                                          'D')).strftime(
             '%Y-%m-%d').tolist(),  # Convert future dates to string
         "predictions": predictions.tolist()
+    }
+
+    return jsonify(data)
+
+def wind_chill(temp, wind_speed):
+    return 13.12 + 0.6215 * temp - 11.37 * wind_speed ** 0.16 + 0.3965 * temp * wind_speed ** 0.16
+
+@app.route('/arima-prediction')
+def arima_prediction():
+    # Fetch and clean the data
+    result = get_data_and_partial_cleaning()
+    result = result[result['ville'] == "Rabat"].sort_values('temps_formaté')
+    result['wind_chill'] = result.apply(lambda row: wind_chill(row['température'], row['vitesse_vent']), axis=1)
+
+    result['temps_formaté'] = pd.to_datetime(result['temps_formaté'])
+    result.set_index('temps_formaté', inplace=True)
+    temperature_series = result['température']
+
+    train_size = int(len(temperature_series) * 0.8)
+    train, test = temperature_series[:train_size], temperature_series[train_size:]
+
+    model = ARIMA(train, order=(5, 1, 0))  # (p, d, q) parameters for ARIMA
+    model_fit = model.fit()
+
+    predictions = model_fit.forecast(steps=len(test))
+
+    # Convert Pandas Series to lists
+    test_list = test.tolist()
+    predictions_list = predictions.tolist()
+    test_index_list = test.index.strftime('%d-%m %H:%M').tolist()  # Convert datetime index to string
+
+    data = {
+        "test": test_list,
+        "predictions": predictions_list,
+        "dates": test_index_list
     }
 
     return jsonify(data)
